@@ -105,15 +105,12 @@ def calculateTrigo(input):
 # return False if the character is not found
 def find_and_return_index(s, f):
     isFound = s.find(f)
-    index = ()
-    while isFound >= 0:
+    index = []
+    while int(isFound) >= 0:
         index += isFound,
         isFound = s.find(f, isFound+1, len(s)-1)
     if index:
-        if len(index)>1:
-            return index
-        else:
-            return index[0]
+        return index
     else:
         return False
     
@@ -122,23 +119,64 @@ def find_and_return_index(s, f):
 # 's' is a string that needs to be replaced
 # 'r' is a string with which the user wants to replace the character
 # '*i' is a tuple in which index numbers of characters that user wants to replace
-def replace_by_index(s: str,r:str, *i:tuple):
+def replace_by_index(s: str,r:str, *i):
     new_str = ""
+    print(i)
     if len(i)>1:        
         new_str += s[:i[0]] + r
         index = 1
         while index < len(i):
+            if i[index] == i[index-1]:
+                index += 1
+                continue
             new_str += s[i[index-1]+1:i[index]] + r
             index += 1
 
         new_str += s.removeprefix(s[:i[len(i)-1]+1])
         return new_str
     else:
-        print("work")
         new_str += s[:i[0]] + r
         new_str += s.removeprefix(s[:i[0]+1])
         print(new_str)
         return new_str
+
+# this functions adds "*" between two brackets or between a number and a bracket
+def multiply_brackets(number_string):
+    #index numbers of "(" in the string
+    indeces_of_open_brackets = find_and_return_index(number_string[1:],"(")
+    i = 0
+    temp = indeces_of_open_brackets.copy()
+    length = len(indeces_of_open_brackets)
+    while i <= length-1:
+        # if the char before "(" is not a digit
+        char_before_open_bracket = number_string[indeces_of_open_brackets[i]]
+        if not char_before_open_bracket.isdigit():
+                temp.remove(indeces_of_open_brackets[i]) # "*" won't be added before "("
+        i+= 1
+    indeces_of_open_brackets = temp
+
+    if indeces_of_open_brackets:
+        # adding "*" before "(" only if it should be added
+        number_string = number_string[0]+ replace_by_index(number_string[1:],"*(", *indeces_of_open_brackets)        
+
+    #index numbers of ")" in the string
+    indeces_of_close_brackets = find_and_return_index(number_string[1:],")")
+    i = 0
+    temp = indeces_of_close_brackets.copy()
+    length = len(indeces_of_close_brackets)
+    while i <= length-1:
+        # if the char after ")" is not a digit
+        if not number_string[indeces_of_close_brackets[i]+2].isdigit():
+                temp.remove(indeces_of_close_brackets[i])
+        i+= 1
+
+    indeces_of_close_brackets = temp
+
+    if indeces_of_close_brackets:
+        # adding "*" before "(" only if it should be added
+        number_string = number_string[0]+ replace_by_index(number_string[1:],")*", *indeces_of_close_brackets)        
+
+    return number_string
 
 # this function is used to take user's input as string and evaluate it
 # return a tuple (input and the result) if the input can be evaluated
@@ -167,20 +205,31 @@ def calculate(input):
             number_only = input # input has only numbers and operators
 
         try:
+            print(number_only)
             result = eval(number_only) # evaluating the user's math problem 
         except (SyntaxError,NameError,TypeError,SyntaxWarning) as e: 
             print(e)
             # if the user's input cannot be evaluated
-            if type(e) == TypeError:
+            if type(e) == TypeError or type(e) == SyntaxError:
                 number_only = number_only.replace(")(", ")*(")
                 try:
+                    print(number_only)
                     result = eval(number_only)
                     return number_only, result
-                except TypeError:
+                except (TypeError, SyntaxError):
                     print(number_only)
-                    number_only_new = number_only[0]+ replace_by_index(number_only[1:],"*(", find_and_return_index(number_only[1:],"("))
-                    result = eval(number_only_new)
-                    return number_only_new,result
+                    new_number_only= multiply_brackets(number_only)
+                    try:
+                        print(new_number_only)
+                        result = eval(new_number_only) # evaluating the user's math problem 
+                        return new_number_only,result
+                    except (SyntaxError,NameError,TypeError,SyntaxWarning) as e:
+                    # result = eval(number_only_new)
+                        error_msg = '''Please enter a meaningful mathematical expression.
+                            \nMake sure brackets are enclosed if you enter brackets.
+                            '''
+                        return error_msg
+                    
 
             error_msg = '''Please enter a meaningful mathematical expression.
                         \nMake sure there are at least two operands and one operator in the middle.

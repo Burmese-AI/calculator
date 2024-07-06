@@ -24,8 +24,6 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 \nYou can also solve a problem in any chat by calling @calculatorByElliott_bot!
                 \n/calulate - compute the mathematical expression that the user enters
                 \nSome operators that may be different to your understanding
-                \nDivision - '/'
-                \nMultiplication - '*'
                 \nPower - '^' or '**'
                 \nDivision but to retrieve remainder - '%'
                 \nDivision but to retrieve quotient - '//'
@@ -39,7 +37,8 @@ async def command_calculate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     bot = context.bot 
 
-    input = str("".join(context.args)).replace(" []", "").lower() # removing all spaces in the input
+    input = str("".join(context.args)).replace(" ", "").lower() # removing all spaces in the input
+    input = input.replace("[]", "")
     response = myFunctions.calculate(input)
 
     if type(response) == tuple:
@@ -77,7 +76,9 @@ async def inline_calculate(update:Update, context: ContextTypes.DEFAULT_TYPE):
 async def msg_calculate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     bot = context.bot
-    input = str("".join(update.message.text)).replace(" []", "").lower() # removing all spaces in the input
+    input = str("".join(update.message.text))
+    input = input.replace(" ", "")
+
     response = myFunctions.calculate(input)
 
     if type(response) == tuple:
