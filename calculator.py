@@ -51,15 +51,18 @@ async def command_calculate(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def inline_calculate(update:Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.inline_query.query
     input = str("".join(query)).replace(" ", "").lower() # removing all spaces in the input
-
     after_calculating = myFunctions.calculate(input)
     # if the query could be evaluated, after_calculating should be a tuple
-    if type(after_calculating):
-        result = str(after_calculating[1]) # this will be the result of the user's math problem
+    if type(after_calculating)==tuple:
+        result = after_calculating[1] # this will be the result of the user's math problem
         message = result
     else:
-        result = str(query) # the user's query will be reflected
-        message = str(after_calculating)
+        if query:
+            result = str(query) # the user's query will be reflected
+        else:
+            result = "NO INPUT"
+        print(after_calculating)
+        message = after_calculating
 
     inline_response = [] 
     inline_response.append(
