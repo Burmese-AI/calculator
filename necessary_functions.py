@@ -210,7 +210,7 @@ def calculate(input):
         except (SyntaxError,NameError,TypeError,SyntaxWarning) as e: 
             print(e)
             # if the user's input cannot be evaluated
-            if type(e) == TypeError or type(e) == SyntaxError:
+            if type(e) == TypeError:
                 number_only = number_only.replace(")(", ")*(")
                 try:
                     print(number_only)
