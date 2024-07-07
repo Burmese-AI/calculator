@@ -166,6 +166,9 @@ def multiply_brackets(number_string):
     length = len(indeces_of_close_brackets)
     while i <= length-1:
         # if the char after ")" is not a digit
+        if indeces_of_close_brackets[i]+1 == len(number_string)-1:
+             temp.remove(indeces_of_close_brackets[i])
+             break
         if not number_string[indeces_of_close_brackets[i]+2].isdigit():
                 temp.remove(indeces_of_close_brackets[i])
         i+= 1
